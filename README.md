@@ -39,21 +39,13 @@ ps -ef | grep docker@127.0.0.1
 1529087358 15682 15490   0  5:41   ttys015    0:00.00 grep docker@127.0.0.1
 ```
 
-# Create dev/prod
-```
-kubectl create namespace dev
-kubectl create namespace prod
-helm install mywebapp-release-dev webapp1/ --values webapp1/values.yaml -f webapp1/values-dev.yaml -n dev
-helm install mywebapp-release-prod webapp1/ --values webapp1/values.yaml -f webapp1/values-prod.yaml -n prod
-helm ls --all-namespaces
-```
-
 # List all pods:
 ```
 kubectl get pods --namespace=prod
 kubectl get pods --namespace=dev
 kubectl get pods --namespace=default
 ```
+`kubectl get po -A` - pods all namespaces
 
 # SSH minikube:
 ```
@@ -76,42 +68,42 @@ kubectl delete pods --all
 kubectl describe pod mydeployment-6559fcc65f-26snb
 ```
 
-# Kubectl COMMANDS:
+# KUBECTL commands:
 1. `kubectl --help` - commands list
 2. `kubectl config` - Modify kubeconfig files - ${HOME}/.kube/config
-3. `kubectl config get-contexts`
-4. `kubectl config get-clusters`
-5. `kubectl config get-users`
-6. `kubectl cluster-info` - Kubernetes control plane is running at https://127.0.0.1:55247
-7. `kubectl get no -o wide` - wide nodes info
-8 `kubectl delete pods --all -n prod`
+    1. `kubectl config get-contexts`
+    2. `kubectl config get-clusters`
+    3. `kubectl config get-users`
+3. `kubectl cluster-info` - Kubernetes control plane is running at https://127.0.0.1:55247
+4. `kubectl get no -o wide` - wide nodes info
+    1. `kubectl get nodes` - list nodes
+    2. `kubectl get nodes --show-labels` - list of nodes with labels
+    3. ### `kubectl get endpoints` - все ip:port кластера
+        1. `kubectl describe endpoints nginx-deployment ` - посмотреть endpoint подробнее
+5. `kubectl delete pods --all -n prod`
     `kubectl delete pods --all -n dev`
     `kubectl delete pods --all`
-9. `curl -v https://registry-1.docker.io/v2/` - check proxy
-10. `sudo vi /etc/resolv.conf` - Установите правильные DNS-серверы в вашем окружении Minikube
-11. Файл `/etc/systemd/system.conf.d/proxy-default-environment.conf` предназначен для настройки переменных окружения по умолчанию для всех служб и процессов, запускаемых в вашей системе с использованием systemd.
+6. ### `kubectl config current-context` - check context
+7. `kubectl config use-context docker-desktop` - change context
+# Kubectl Labels:
+8. `kubectl get po --show-labels` - list pods labels
+9. `kubectl get po -l app=nginx ` - filter by label
+    1. `kubectl get po -l app!=nginx,cluster=prod ` - not equal
+    2. `kubectl delete po -l cluster=prod` - delete by cluster tag
+10. `kubectl label node minikube env=dev` - tag Node
+11. `kubectl label node minikube env=prod --overwrite` - change Node tag
+
+
+# MINIKUBE commands:
+1. `minikube image load server:1.0` - laod image from local to cluster
+2. `minikube status` - cluster status
+
+
+# Work in cluster:
+1. `curl -v https://registry-1.docker.io/v2/` - check proxy
+2. `sudo vi /etc/resolv.conf` - Установите правильные DNS-серверы в вашем окружении Minikube
+3. Файл `/etc/systemd/system.conf.d/proxy-default-environment.conf` предназначен для настройки переменных окружения по умолчанию для всех служб и процессов, запускаемых в вашей системе с использованием systemd.
     `[Manager]`
     `DefaultEnvironment="HTTP_PROXY=http://prx-srv.mbrd.ru:3128" "HTTPS_PROXY=http://prx-srv.mbrd.ru:3128" "NO_PROXY=*.test.example.com,.example2.com,127.0.0.0/8,control-plane.minikube.internal"`
-12. `sudo systemctl daemon-reload`
-13. `sudo systemctl restart docker`
-14. `minikube status` - 
-15. `kubectl get po -A` - pods all namespaces
-16. ### `kubectl config current-context` - check context
-17. `kubectl config use-context docker-desktop` - change context
-
-
-# Create pod:
-1. `kubectl apply -f nginx.yaml` - create pod
-    1. `kubectl apply -f server-app.yaml`
-2. `kubectl logs nginx-pod` - logs of a pod
-    1. `kubectl logs -f server-app` - в режиме онлайн
-    2. `kubectl logs -f server-app -c server` - логи сервера
-    3. `kubectl logs -f server-app -c client` - логи клиента
-3. `kubectl get pod redis -n default -o jsonpath=”{..image}”` - посмотреть версию образа
-4. `kubectl run redis --image=redis:5.0 -n default` - запуск redis pod
-5. `kubectl edit pod redis -n default` - редактирование redis-pod.yaml
-
-
-# minikube Commands:
-1. `minikube image load server:1.0` - laod image from local to cluster
-
+4. `sudo systemctl daemon-reload`
+5. `sudo systemctl restart docker`
