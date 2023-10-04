@@ -1,0 +1,3 @@
+FROM alpine:3.12
+
+CMD ["sh", "-c", "while true;do echo v2;sleep 2;done"]
