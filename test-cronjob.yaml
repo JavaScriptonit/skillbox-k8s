@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello # Задает имя для данного CronJob ресурса
+spec:
+  schedule: "*/1 * * * *" # расписание для выполнения CronJob. Установлено "каждую минуту"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: hello
+            image: busybox
+            command:
+            - /bin/sh # Задает команду в виде строки, которая будет выполнена в оболочке /bin/sh
+            - -c
+            - date; echo Hello from Kubernetes cluster # Команда, которая будет выполнена в контейнере
