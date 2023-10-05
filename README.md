@@ -107,3 +107,10 @@ kubectl describe pod mydeployment-6559fcc65f-26snb
     `DefaultEnvironment="HTTP_PROXY=http://prx-srv.mbrd.ru:3128" "HTTPS_PROXY=http://prx-srv.mbrd.ru:3128" "NO_PROXY=*.test.example.com,.example2.com,127.0.0.0/8,control-plane.minikube.internal"`
 4. `sudo systemctl daemon-reload`
 5. `sudo systemctl restart docker`
+# Work in Pod:
+1. `curl http://nginx-deployment.default.svc.cluster.local` - использует полное доменное имя сервиса в формате:
+<имя-сервиса>.<имя-пространства-имен>.svc.cluster.local.
+nginx-deployment - это имя сервиса, default - имя пространства имен.
+Curl может не работать если есть несколько развертываний с одним и тем же именем, но в разных пространствах имен
+    1. `curl http://nginx-deployment.default` - использует "сокращенное" имя сервиса
+    2. `curl http://nginx-deployment` 
