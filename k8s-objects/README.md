@@ -12,6 +12,7 @@ helm ls --all-namespaces
 Нельзя знать ip адреса подов заранее. K8s даёт IP поду после его создания на ноде.
 Может работать несколько реплик 1го приложения. Каждая реплика имеет свой IP.
 Все поды должны быть доступны через 1 единый IP. 
+
 1. `kubectl apply -f nginx.yaml` - create pod
     1. `kubectl apply -f server-app.yaml`
 2. `kubectl logs nginx-pod` - logs of a pod
@@ -24,11 +25,13 @@ helm ls --all-namespaces
 4. `kubectl run redis --image=redis:5.0 -n default` - запуск redis pod
 5. `kubectl edit pod redis -n default` - редактирование redis-pod.yaml
 6. `kubectl edit pod nginx-f57dn` - edit pod
-7. `kubectl run tmp-pod --rm -i --ty --image nicolaka/netshoot -- /bin/bash` - создать под, который будет удален после выхода из него
+7. `kubectl run tmp-pod --rm -i --tty --image nicolaka/netshoot -- /bin/bash` - создать под, который будет удален после выхода из него
     1. `curl http://nginx-deployment` - test connection from tmp pod
 
 
 # Create ReplicaSet (ReplicationController - old version):
+Гарантирует, что указанное количество подов ReplicaSet всегда будет запущено и работать в кластере
+
 1. `create -f rs_nginx.yaml` - create RS
 2. `kubectl get rs` - list of rs
     1. `nginx-deployment-74888999bf` - 74888999bf - это хэш значения шаблона пода в описание deployment
@@ -71,6 +74,8 @@ helm ls --all-namespaces
 
 
 # Create DaemonSet:
+В отличие от ReplicaSet, который обеспечивает желаемое количество подов в общем для всего кластера, DaemonSet гарантирует наличие одного экземпляра пода на каждом хосте. DaemonSet особенно полезен для запуска определенного набора подов, таких как лог-агенты, мониторинговые агенты и другие, на каждом узле кластера.
+
 1. `Daemon в Linux` - это фоновая программа (не требующая взаимодействия с пользовтелем)
     Например:
     1. `Daemon Fluent Bit` - демон по сбору логов
@@ -79,8 +84,6 @@ helm ls --all-namespaces
 3. `kubectl apply -f ../fluentd-ds.yaml` - create ds
 4. `kubectl get ds` - list of ds
 5. `kubectl delete -f ../fluentd-ds.yaml` - delete ds
-6. `kubectl expose deployment nginx-deployment --port 80 --target-port 80` - маршрутизация трафика с порта сервиса 80 на порты подов 80
-    1. `kubectl get services` - после expose deployment port для просмотра сервиса
 
 
 # Create Service:
@@ -88,6 +91,32 @@ helm ls --all-namespaces
 Сервис даёт 1 единую и постоянную точку входа в группу подов.
 Каждый сервис имеет свой IP и порт (которые не поменяются пока он существует).
 Клиент подключается к Сервису и подключение маршрутизируется в 1 из подов.
+
 1. `kubectl get services` - список сервисов
 2. `kubectl describe service/nginx-deployment` - информация о сервисе
-3. ``
+3. `kubectl expose deployment nginx-deployment --port 80 --target-port 80` - маршрутизация трафика с порта сервиса 80 на порты подов 80
+    1. `kubectl get services` - после expose deployment port для просмотра сервиса
+4. `kubectl create service clusterip mydb --tcp=5432:5432` - clusterip - тип сервиса
+
+
+# Create Jobs:
+Jobs используется для запуска однократных заданий в кластере. Когда задание Job успешно выполнено, Kubernetes завершает задание и сохраняет его историю выполнения.
+
+1. `apply -f test-job.yaml` - create jobs
+2. `kubectl get jobs` - list jobs
+3. `kubectl logs pod/pi-5r94h` - logs after completing
+# Create CronJobs:
+Используется для запуска периодических заданий на основе расписания.
+Поды CronJob автоматически удаляются после успешного выполнения задания, если в спецификации CronJob не указано сохранение истории выполнения.
+
+1. `kubectl apply -f test-cronjob.yaml` - create CronJob
+2. `kubectl get cronjob` - list of cronjobs
+
+# Init Containers:
+Использовать для инициализации подов. 
+Используется для запуска контейнеров, которые должны быть выполнены перед основными контейнерами в поде
+
+1. `kubectl apply -f test-init-pod.yaml` - create pod/busybox-pod 0/1 Init:0/1
+2. `kubectl logs pod/busybox-pod -c init-db` - logs init container
+3. `kubectl get event --field-selector involvedObject.name=busybox-pod` - filter logs
+    1. `kubectl get event --field-selector involvedObject.name=busybox-pod --watch` - realtime logs
