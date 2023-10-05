@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  completions: 5 # сколько раз job должна отработать
+  parallelism: 5 # сколько pod с задачей может запуститься параллельно
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: perl
+        command: ["perl", "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+      restartPolicy: Never
+      activeDeadlineSeconds: 100 # тайм-аут джобы
+  backoffLimit: 4 # в случае ошибки - кол-во перезапусков джобы
