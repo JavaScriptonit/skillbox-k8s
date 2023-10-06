@@ -1,0 +1,25 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: validating-webhook
+webhooks:
+  - name: test.example.com
+    failurePolicy: Fail
+    sideEffects: None
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: admission-controller
+        namespace: default
+        path: /validate/deployments
+        port: 8001
+      caBundle: MIICuDCCAaACCQCQe0cesdN2DDANBgkqhkiG9w0BAQsFADAeMQswCQYDVQQGEwJydTEPMA0GA1UEBwwGbW9zY293MB4XDTIzMTAwNjE0MTQ1NloXDTI0MTAwNTE0MTQ1NlowHjELMAkGA1UEBhMCcnUxDzANBgNVBAcMBm1vc2NvdzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMZlRIuyQ9RRvAGfwStl3YZCgRNVlChWRwOXRgsbBewmFdZWrONRpmT48d4GwOT2AP/YrtLfbwQOfpMnnISBkSxo9mHThS0CbIXdDIrm/bGqi5y/yR41BlIpHEVOtA3dESPD2NLyKiw3Ap0MGW6gN7W/ktgLQX05M1pnh8oyea9dN0LyZ0PbbKRkCQEZk/VNs99E2Rlbfje6DYMXuH+itJCybHvtEjfkw5v2tfhg3pU6NzKh1AldkadzPm9Ip6B91nUxqHsZPGt7y4YMHU8sHDL1esw39Mbe1oMSxHognmzAGNbbZraB/xhQXKL9pSS6HEpRpXqBLTzOQtz16EiRQmcCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEApOBQ+JCKJMLepE0Oi9JOqtKqB6URzrW5lrrhoxV012LJ7KzK3QoLiAxpazKUioxHjXun4IDPHRE8YI41yOHIB0FfbGRoCVFS3OlhjDgGNmPTAbY8aBpYUHEG1XKSIdHRnEkAARjPvqqeBfjm7J/FXsVMv1F/dYOAQt0HuiukbPJFAEBj7fD5Grej8hduCkT4iWUrepg8cSQQjpINS34yxqV++/i0zEhaLjWyNxzOKYBJ2D+F9FZ20lOxMknwr/GPUbqe6Eco+SMdu9tIDv1/1YJicjXP5O+VvpExjz3oGhGpUY0LWg7PNglUxnoYrJhwUR3dkIT4Q5JVqjLkXlQ+Sg==
+    rules: 
+      - apiGroups: ["apps"]
+        resources:
+          - "deployments"
+        apiVersions: 
+          - "*"
+        operations:
+          - CREATE
