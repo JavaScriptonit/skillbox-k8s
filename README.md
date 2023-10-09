@@ -108,7 +108,10 @@ kubectl describe pod mydeployment-6559fcc65f-26snb
 4. `sudo systemctl daemon-reload`
 5. `sudo systemctl restart docker`
 # Work in Pod:
-1. `curl http://nginx-deployment.default.svc.cluster.local` - использует полное доменное имя сервиса в формате:
+1. `kubectl exec envar-demo -- printenv` - print pod's environment
+2. `kubectl exec -it envar-demo -- sh` - sh pod
+3. `kubectl exec -it envar-demo -- bash` - bash pod
+4. `curl http://nginx-deployment.default.svc.cluster.local` - использует полное доменное имя сервиса в формате:
 <имя-сервиса>.<имя-пространства-имен>.svc.cluster.local.
 nginx-deployment - это имя сервиса, default - имя пространства имен.
 Curl может не работать если есть несколько развертываний с одним и тем же именем, но в разных пространствах имен
