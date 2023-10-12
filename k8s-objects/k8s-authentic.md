@@ -22,7 +22,7 @@
     1. `kubectl get sa coredns -n kube-system -o json` - найти имя секрета, где SA хранит токен
 3. `kubectl get po coredns-787d4945fb-gsv6g -n kube-system -o json` - get serviceAccount/serviceAccountName - coredns
 4. `kubectl get secret coredns-token-g6gkz -n kube-system -o jsonpath='{.data.token}' | base64 -d` - получить раскодированный token из секрета
-5. `kubectl config view | grep server` - адрес Api сервера: https://kubernetes.docker.internal:6443 / https://127.0.0.1:52935
+5. ### `kubectl config view | grep server` - адрес Api сервера: https://kubernetes.docker.internal:6443 / https://127.0.0.1:52935
 6. `curl -k https://127.0.0.1:52935` - проверить доступ к Api серверу
     1. `curl -k https://127.0.0.1:52935 -H "Authorization: Bearer $(kubectl get secret coredns-token-g6gkz -n kube-system -o jsonpath='{.data.token}' | base64 -d)"` - курл с токеном для авторизации в Api сервере
     2. `curl -k https://127.0.0.1:52935/api/v1/services` - получить сервисы всего кластера
@@ -45,13 +45,16 @@
         2. `cd /var/lib/minikube/certs/` - сертификаты для Api сервера
         3. `vi static-tokens` - создать файл с пользователем для Api сервера
             1. `31ada4fd-adec-460c-809a-9e56ceb75269,user1,1234,developer` - value static-tokens
-        4. `minikube start --extra-config=apiserver.token-auth-file=/var/lib/minikube/certs/static-tokens` - запустить кластер с конфигом для Api сервера
+        4. ### `minikube start --extra-config=apiserver.token-auth-file=/var/lib/minikube/certs/static-tokens` - запустить кластер с конфигом для Api сервера
         5. `docker ps | grep api` - list Api containers
         5. `docker inspect 8d4b222258e4` - inspect api
             1. `"--token-auth-file=/var/lib/minikube/certs/static-tokens"`- in Entrypoint
         6. `kubectl cluster-info dump | less` - проверить конфигурацию кластера
             1. `/auth-file` - найти параметр
         7. `curl -k -H "Authorization: Bearer 31ada4fd-adec-460c-809a-9e56ceb75269" https://127.0.0.1:56994` - curl с токеном для Api сервера
+            1. `curl -k -H "Authorization: Bearer 31ada4fd-adec-460c-809a-9e56ceb75269" https://127.0.0.1:54726/api/v1` - get APIResourceList
+            2. `curl -k -H "Authorization: Bearer 31ada4fd-adec-460c-809a-9e56ceb75269" https://127.0.0.1:54726/api/v1/namespaces/default/pods` - get pods
+            3. `curl -k -H "Authorization: Bearer 51ada4fd-adec-460c-809a-9e56ceb75269" https://127.0.0.1:57186/api/v1/namespaces/kube-system/pods` - get kube pods
 
 3. Файл с пользователями/паролями - с версии 1.19 способ удалён
 4. Service account - применим для внутренних пользователей. Аутентифицируемся по ключу, который генерирует k8s
