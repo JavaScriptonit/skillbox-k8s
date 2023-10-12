@@ -72,8 +72,15 @@ kubectl describe pod mydeployment-6559fcc65f-26snb
 1. `kubectl --help` - commands list
 2. `kubectl config` - Modify kubeconfig files - ${HOME}/.kube/config
     1. `kubectl config get-contexts`
+        1. `kubectl config set-context default-pod-reader --cluster=minikube --user=user1` - add user with context=default-pod-reader
+        2. `kubectl config set-credentials user1 --token=31ada4fd-adec-460c-809a-9e56ceb75269` - add token
+        3. `kubectl config use-context default-pod-reader` - change context
     2. `kubectl config get-clusters`
     3. `kubectl config get-users`
+    4. `kubectl config view` - view config
+        1. `openssl x509 -in /Users/aashabunov/.minikube/profiles/minikube/client.crt -text -noout` - view minikube .crt
+            1. `Subject: O=system:masters, CN=minikube-user` - group and user
+        2. `kubectl get clusterrolebinding cluster-admin -o yaml` - view ClusterRoleBinding (cluster-admin) - Group - system:masters
 3. `kubectl cluster-info` - Kubernetes control plane is running at https://127.0.0.1:55247
 4. `kubectl get no -o wide` - wide nodes info
     1. `kubectl get nodes` - list nodes
