@@ -112,6 +112,11 @@ kubectl describe pod mydeployment-6559fcc65f-26snb
 3. Файл `/etc/systemd/system.conf.d/proxy-default-environment.conf` предназначен для настройки переменных окружения по умолчанию для всех служб и процессов, запускаемых в вашей системе с использованием systemd.
     `[Manager]`
     `DefaultEnvironment="HTTP_PROXY=http://prx-srv.mbrd.ru:3128" "HTTPS_PROXY=http://prx-srv.mbrd.ru:3128" "NO_PROXY=*.test.example.com,.example2.com,127.0.0.0/8,control-plane.minikube.internal"`
+    1. После чистки файла proxy-default-environment.conf - обновить переменные окруженния:
+    `unset HTTPS_PROXY`
+    `unset HTTP_PROXY`
+    `unset http_proxy`
+    `unset https_proxy`
 4. `sudo systemctl daemon-reload`
 5. `sudo systemctl restart docker`
 # Work in Pod:
