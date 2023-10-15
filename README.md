@@ -117,6 +117,7 @@ kubectl describe pod mydeployment-6559fcc65f-26snb
     `unset HTTP_PROXY`
     `unset http_proxy`
     `unset https_proxy`
+    2. `env` - проверить переменные окружения после чистки конфигов прокси
 4. `sudo systemctl daemon-reload`
 5. `sudo systemctl restart docker`
 # Work in Pod:
