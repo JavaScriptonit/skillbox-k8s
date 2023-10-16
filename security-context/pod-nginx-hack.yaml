@@ -15,7 +15,7 @@ spec:
       type: Directory
     name: master
   tolerations:
-  - effect: NoShedule
+  - effect: NoSchedule
     operator: Exists
   nodeSelector:
     node-role.kubernetes.io/master: ""
