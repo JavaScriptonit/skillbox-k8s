@@ -41,7 +41,16 @@ PSP - это механизм в Kubernetes, который позволяет �
 1. ### `minikube start --extra-config=apiserver.enable-admission-plugins=PodSecurityPolicy --addons=pod-security-policy` - enable PSP (включает использование PodSecurityPolicy)
     1. При запуске с параметром (когда PSP еще не созданы ранее) ВСЕ поды, которые не могут пройти проверки - запуститься не могут
     2. minikube создаст дефолтные разрешительные и запретительные политики и привяжет их
-2. https://github.com/rancher/rke2/issues/4313 - "command failed" err="enable-admission-plugins plugin \"PodSecurityPolicy\" is unknown"
+    3. `kubectl get psp privileged` - RunAsAny from config pod-security-policy.yaml - привилигированная политика где всё разрешено для NS - kube-system чтобы монтировать любые Capabilities и папки
+    4. `kubectl edit psp privileged` - vim file
+    5. `kubectl edit psp restricted` - view ограниченную политику
+    6. `kubectl edit clusterrole psp:privileged` - 
+    7. `kubectl get rolebindings -n kube-system` - мапит clusterrole psp:privileged в NS kube-system
+    8. `kubectl edit rolebinding default:privileged -n kube-system` - мапит clusterrole к 3 объектам system:master, system:nodes, system:serviceaccounts:kybe-system
+
+
+### Если minikube не запускается:
+1. https://github.com/rancher/rke2/issues/4313 - "command failed" err="enable-admission-plugins plugin \"PodSecurityPolicy\" is unknown"
     1. `sudo journalctl -u docker` - errors docker
     2. `systemctl status kubelet` - errors kubelet
     3. `vi /etc/kubernetes/manifests/kube-apiserver.yaml` - check apiserver config
@@ -49,3 +58,5 @@ PSP - это механизм в Kubernetes, который позволяет �
         2. `vi /Users/aashabunov/.minikube/profiles/minikube/config.json` - minikube config
     4. `sed -i "s/--enable-admission-plugins=PodSecurityPolicy//g" /etc/kubernetes/manifests/kube-apiserver.yaml && sudo systemctl restart kubelet` - delete arg in running minikube cluster
     5. 
+
+
