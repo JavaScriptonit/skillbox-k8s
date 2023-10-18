@@ -1,0 +1,13 @@
+replicas:
+  test: 1
+  production: 3
+host:
+  _default: dev.billing.com
+  test: test.billing.com
+  prod: production.billing.com
+image:
+  name: billing
+  tag: v1.0
+docker:
+  secret:
+    create: false

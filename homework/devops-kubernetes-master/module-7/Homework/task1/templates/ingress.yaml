@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  rules:
+    - host: {{ pluck .Values.global.env .Values.host | first }}
+      http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: {{ .Chart.Name }}
+                port:
+                  number: 8080

@@ -1,0 +1,9 @@
+resources:
+  - ../../base
+
+namespace: prod
+namePrefix: prod-
+images: 
+  - name: nginx
+    newTag: "1.12"
+

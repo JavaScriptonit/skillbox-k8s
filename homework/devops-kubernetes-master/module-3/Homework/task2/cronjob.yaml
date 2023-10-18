@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ip-data-getter
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: ip-data-getter
+            image: curlimages/curl:7.76.0
+            command:
+            - /bin/sh
+            - -c
+            - date; echo " + "; curl --silent ipinfo.io/ip

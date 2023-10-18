@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: billing-stateful
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: billing-stateful
+  serviceName: billing-stateful
+  template:
+    metadata:
+      labels:
+        app: billing-stateful
+    spec:
+      initContainers:
+        - name: check-db-ready
+          image: postgres:9.6
+          command: [ 'sh', '-c',
+              'until pg_isready -h postgres -p 5432;
+          do echo database is not ready; sleep 2; done;' ]
+      containers:
+        - name: billing
+          image: billing:v2.0
+          env:
+            - name: DEBUG
+              value: "True"
+            - name: DATABASE_URL
+              value: postgresql://user:password@postgres/db
+            - name: LOG_FILE
+              value: "/var/log/app.log"
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: pvc-small
+  volumeClaimTemplates:
+  - metadata:
+      name: app-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-host-path"
+      resources:
+        requests:
+          storage: 1Gi
+  ### add PVC template here
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-headless
+spec:
+  selector:
+    app: billing-stateful
+  clusterIP: None
+  ### make me headless
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

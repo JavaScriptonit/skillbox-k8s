@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-host-path
+provisioner: k8s.io/minikube-hostpath
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: Immediate
