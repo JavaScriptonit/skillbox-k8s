@@ -57,4 +57,42 @@ minikube       Ready    control-plane   36s   v1.26.3
 minikube-m02   Ready    <none>          18s   v1.26.3
 minikube-m03   Ready    <none>          1s    v1.26.3
 ```
-7. 
+7. `kubectl describe configmaps kube-flannel-cfg -n kube-flannel` - kube-flannel configmap info
+```
+net-conf.json:
+----
+{
+  "Network": "10.244.0.0/16",
+  "Backend": {
+    "Type": "vxlan"
+  }
+}
+```
+8. `docker exec -it minikube-m02 bash`, `root@minikube-m02:/# ip a` - посмотреть сетевые интерфейсы на worker ноде
+```
+5: flannel.1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UNKNOWN group default 
+    link/ether ca:55:df:00:ee:8d brd ff:ff:ff:ff:ff:ff
+    inet 10.244.1.0/32 scope global flannel.1
+       valid_lft forever preferred_lft forever
+```
+9. `root@minikube-m02:/# ip -details link show flannel.1` - проверить созданное flannel виртуальное vxlan устройство - vxlan id 1 local 192.168.67.3 
+```
+5: flannel.1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default 
+    link/ether ca:55:df:00:ee:8d brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 68 maxmtu 65535 
+    vxlan id 1 local 192.168.67.3 dev eth0 srcport 0 0 dstport 8472 nolearning ttl auto ageing 300 udpcsum noudp6zerocsumtx noudp6zerocsumrx addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535
+```
+
+# NetworkPolicy:
+### Для контроля сетевого взаимодействия используются Сетевые политики:
+Без сетевых политик - любой под имеет доступ к подам других нод в любых NS
+
+1. `minikube start --cni calico` - создать кластер с CNI calico (который поддерживает сетевые политики)
+2. `kubectl apply -f /Users/aashabunov/IdeaProjects/kubernetes/network-policy/deny-all.yaml` - networking.k8s.io/default-deny created.
+    1. `kubectl run app --image nicolaka/netshoot --labels="app=app" -- /bin/bash -c "sleep 3600"` - pod/app created
+    2. `kubectl run db --image postgres --labels="app=database" --env="POSTGRES_PASSWORD=123"` - pod/db created
+    3. `kubectl get po -o wide` - pods info
+    4. `kubectl exec -it app -- bash` - connect pod app
+    5. `telnet db <ip> 543` - check connection (timeout)
+3. `kubectl apply -f /Users/aashabunov/IdeaProjects/kubernetes/network-policy/allow.yaml` - networking.k8s.io/postgres-allow created.
+    1. `kubectl exec -it app -- bash` - connect pod app
+    2. `telnet db <ip> 543` - check connection (connected to <ip>)
