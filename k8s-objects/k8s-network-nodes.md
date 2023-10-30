@@ -96,3 +96,4 @@ net-conf.json:
 3. `kubectl apply -f /Users/aashabunov/IdeaProjects/kubernetes/network-policy/allow.yaml` - networking.k8s.io/postgres-allow created.
     1. `kubectl exec -it app -- bash` - connect pod app
     2. `telnet db <ip> 543` - check connection (connected to <ip>)
+
