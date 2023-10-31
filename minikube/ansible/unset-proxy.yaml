@@ -1,0 +1,59 @@
+- name: Execute Commands on Minikube Nodes
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Execute commands on minikube node
+      command: docker exec -it minikube bash -c 'source ~/.bashrc && echo $HTTPS_PROXY $HTTP_PROXY $http_proxy $https_proxy'
+      become: true
+      register: minikube_env
+
+    - debug:
+        var: minikube_env.stdout_lines
+# ---------------------------------------------------------------------------------
+# - name: Execute Commands on Minikube Nodes
+#   hosts: localhost
+#   gather_facts: no
+#   tasks:
+#     - name: Execute commands on minikube node
+#       command: docker exec -it minikube bash -c 'export HTTPS_PROXY="" && export HTTP_PROXY="" && export http_proxy="" && export https_proxy=""'
+#       become: true
+    
+#     - name: Save and display environment values for minikube
+#       command: docker exec -it minikube env
+#       register: minikube_env
+#       become: true
+
+#     - debug:
+#         var: minikube_env.stdout_lines
+# ---------------------------------------------------------------------------------
+    # - name: Save and display environment values for minikube-m02
+    #   command: docker exec -it minikube-m02 env
+    #   register: minikube_m02_env
+    #   become: true
+
+    # - name: Unset HTTPS_PROXY and https_proxy on minikube-m02 node
+    #   command: docker exec -it minikube-m02 bash -c 'export HTTPS_PROXY="" && export https_proxy="" && echo "HTTPS_PROXY Unset" && echo "https_proxy Unset"'
+    #   become: true
+
+    # - name: Restart Docker on minikube-m02 node
+    #   command: docker exec -it minikube-m02 bash -c "sudo systemctl daemon-reload && sudo systemctl restart docker"
+    #   become: true
+
+    # - debug:
+    #     var: minikube_m02_env.stdout_lines
+
+    # - name: Save and display environment values for minikube
+    #   command: docker exec -it minikube env
+    #   register: minikube_env
+    #   become: true
+
+    # - name: Unset HTTPS_PROXY and https_proxy on minikube node
+    #   command: docker exec -it minikube bash -c 'export HTTPS_PROXY="" && export https_proxy="" && echo "HTTPS_PROXY Unset" && echo "https_proxy Unset"'
+    #   become: true
+
+    # - name: Restart Docker on minikube node
+    #   command: docker exec -it minikube bash -c "sudo systemctl daemon-reload && sudo systemctl restart docker"
+    #   become: true
+
+    # - debug:
+    #     var: minikube_env.stdout_lines
