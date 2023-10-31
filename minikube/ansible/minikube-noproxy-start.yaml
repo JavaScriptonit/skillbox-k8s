@@ -1,0 +1,25 @@
+# - name: Start Minikube Cluster
+#   hosts: localhost
+#   gather_facts: no
+#   tasks:
+#     - name: Start minikube cluster
+#       command: minikube start --nodes 3 --cni flannel
+
+- name: Execute Commands on Minikube Nodes
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Execute commands on each minikube node
+      command: docker exec -it minikube bash -c "rm -f /etc/systemd/system.conf.d/proxy-default-environment.conf && unset HTTPS_PROXY && unset HTTP_PROXY && unset http_proxy && unset https_proxy && sudo systemctl daemon-reload && sudo systemctl restart docker"
+      become: true
+
+# - name: Restart Minikube Nodes
+#   hosts: localhost
+#   gather_facts: no
+#   tasks:
+#     - name: Restart minikube nodes
+#       command: minikube stop
+#       changed_when: false
+
+#     - name: Start minikube nodes
+#       command: minikube start
