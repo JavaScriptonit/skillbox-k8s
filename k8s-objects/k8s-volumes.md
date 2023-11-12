@@ -18,13 +18,24 @@ https://go.skillbox.ru/education/course/devops-kubernetes/a0488f3d-8173-4776-bd0
     3. PersistentVolumeClaim и др.
 
 ### CSI-плагины:
-1. Dell EMC
-2. DigitalOcean Block Storage
-3. NetApp
-4. GlusterFS
-5. IBM Block Storage и др.
+1. Dell EMC: 
+Этот CSI-плагин предоставляет интеграцию с хранилищем данных Dell EMC, позволяя использовать его для создания и управления блочного хранилища в Kubernetes. Особенностью плагина является поддержка различных технологий и функций, таких как репликация данных, сжатие и дедупликация.
+
+2. DigitalOcean Block Storage: 
+Этот CSI-плагин предоставляет интеграцию с DigitalOcean Block Storage, позволяя создавать и управлять блочным хранилищем на платформе DigitalOcean. Особенностью плагина является простота в использовании и возможность масштабирования блочного хранилища.
+
+3. NetApp: 
+Этот CSI-плагин обеспечивает интеграцию с хранилищем данных NetApp, позволяя создавать и управлять блочным хранилищем в Kubernetes. Особенностью плагина является поддержка различных технологий NetApp, таких как Snapshot и FlexClone, а также возможность управления емкостью хранилища через интерфейс Kubernetes.
+
+4. GlusterFS: 
+Этот CSI-плагин предоставляет интеграцию с распределенной файловой системой GlusterFS, позволяя использовать его для создания и управления файловым хранилищем в Kubernetes. Особенностью плагина является поддержка масштабирования и отказоустойчивости GlusterFS, а также возможность предоставления доступа к файловому хранилищу для нескольких подов одновременно.
+
+5. IBM Block Storage: 
+Этот CSI-плагин обеспечивает интеграцию с блочным хранилищем IBM, позволяя создавать и управлять блочным хранилищем в Kubernetes. Особенностью плагина является поддержка различных функций IBM блочного хранилища, таких как шифрование данных и мониторинг производительности.
 
 https://kubernetes-csi.github.io/docs/drivers.html - полный список плагинов
+
+
 
 ## Create pod with volumes:
 1. `kubectl apply -f /Users/aashabunov/IdeaProjects/kubernetes/volumes/pod_2_volumes.yaml`
@@ -56,7 +67,6 @@ volumes-pod-2               1/1     Running   0          6m27s   10.244.1.16   m
 1. `kubectl apply -f /Users/aashabunov/IdeaProjects/kubernetes/volumes/pod_shared_data.yaml` - create 2 containers
 2. `kubectl exec -it two-containers -c second-container -- bash`, `tail -f /pod/data/index.html` - посмотреть как обновляется файл /pod/data/index.html во 2ом контейнере
 3. `kubectl exec -it two-containers -c first-container -- bash`, `while true; do curl http://localhost;sleep 2;done` - посмотреть обновление даты
-
 
 ### Create configmap:
 1. `kubectl create configmap nginx-config --from-file=nginx.conf` - configmap/nginx-config created
@@ -209,3 +219,46 @@ cassandra-data-cassandra-2   Bound    pvc-4897d63a-7ab0-47bd-b39b-d8504f8511b3  
 ```
 7. `kubectl exec -it pod/cassandra-0 bash`, `nodetool status` - 
 8. `kubectl exec -it pod/cassandra-0 bash`, `ping cassandra-0.cassandra.default.svc.cluster.local` - [pod-0.my-service.default.svc.cluster.local] 
+
+
+
+# Vault:
+Некоторые недостатки Kubernetes Secrets включают:
+Недостаток функциональности: Kubernetes Secrets предназначены только для хранения пар ключ-значение, что ограничивает их использование в сценариях, требующих более сложной структуры данных.
+Ограниченная безопасность: Передача секретов в открытом виде в манифесты Kubernetes открыта для атак, особенно при работе в общедоступном репозитории кода.
+Отсутствие централизованного управления: Kubernetes Secrets не предлагает централизованного механизма для управления и обновления секретов, что может привести к сложностям при обслуживании.
+Vault - это инструмент для управления секретами и доступами, который обеспечивает надежное хранение, совместное использование и управление секретами в централизованном режиме. Он предлагает более широкий набор функций и возможностей по сравнению с Kubernetes Secrets:
+Централизованное управление: Vault предоставляет централизованное API для управления, создания и обновления секретов, что облегчает процесс управления секретами в среде Kubernetes.
+Безопасное хранение: Vault предлагает шифрование и другие механизмы безопасности для защиты секретов от несанкционированного доступа.
+Дополнительные возможности: Vault поддерживает динамическую генерацию секретов, аудит и доступа с разделением привилегий.
+Шаги для настройки Vault с Kubernetes Minikube:
+Шаг 1: Установите Minikube и запустите его.
+
+Шаг 2: Установите клиентский интерфейс Vault (Vault CLI).
+
+Шаг 3: Создайте манифест для развертывания ваулта в кластере. Например, создайте файл vault.yaml со следующим содержимым:
+
+Шаг 4: Создайте манифест для создания службы Vault. Создайте файл vault-service.yaml со следующим содержимым:
+
+Шаг 5: Примените манифесты, чтобы развернуть Vault в Minikube:
+```
+kubectl apply -f vault.yaml
+kubectl apply -f vault-service.yaml
+```
+Шаг 6: Проверьте, что Vault развернут успешно и имеет службу:
+```
+kubectl get pods
+kubectl get services
+```
+Шаг 7: Создайте конфигурационный файл для Vault CLI. Например, создайте файл vault-config.hcl со следующим содержимым:
+
+Шаг 8: Установите переменные окружения для использования настроенного Vault CLI:
+```
+export VAULT_ADDR=http://[minikube-ip]:31000
+export VAULT_CONFIG_PATH=/path/to/vault-config.hcl
+```
+Шаг 9: Устанавливаем корневой токен для ваулта.
+```
+vault login root
+```
+После выполнения этих шагов Vault должен быть настроен и готов к использованию с Kubernetes Minikube.
