@@ -1,0 +1,33 @@
+nodeExporter:
+  image: bitnami/node-exporter:latest
+  listenAddress: ":9100"
+  procfsPath: "/host/proc"
+  sysfsPath: "/host/sys"
+  rootfsPath: "/rootfs"
+  ignoredMountPoints: "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+
+cadvisorExporter:
+  image: google/cadvisor:latest
+  port: 8080
+  volumes:
+    - "/:/rootfs:ro"
+    - "/var/run:/var/run:rw"
+    - "/sys:/sys:ro"
+    - "/var/lib/docker/:/var/lib/docker:ro"
+
+gitlabRunner:
+  image: gitlab/gitlab-runner:alpine-v14.1.0
+  volumeMounts:
+    - name: docker-socket
+      mountPath: "/var/run/docker.sock"
+    - name: gitlab-runner-config
+      mountPath: "/etc/gitlab-runner"
+  restartPolicy: "Always"
+
+volumes:
+  - name: docker-socket
+    hostPath:
+      path: "/var/run/docker.sock"
+  - name: gitlab-runner-config
+    hostPath:
+      path: "/etc/gitlab-runner"
