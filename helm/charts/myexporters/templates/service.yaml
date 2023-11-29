@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: exporters
+spec:
+  selector:
+    app: exporters
+  ports:
+    - protocol: TCP
+      port: 9100
+      targetPort: 9100
+      name: node-exporter
+    - protocol: TCP
+      port: {{ .Values.cadvisorExporter.port }}
+      targetPort: {{ .Values.cadvisorExporter.port }}
+      name: cadvisor-exporter

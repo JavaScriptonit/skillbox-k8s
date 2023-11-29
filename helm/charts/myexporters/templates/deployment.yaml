@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exporters
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exporters
+  template:
+    metadata:
+      labels:
+        app: exporters
+    spec:
+      containers:
+        - name: node-exporter
+          image: "{{ .Values.nodeExporter.image }}"
+          command:
+            - "--web.listen-address={{ .Values.nodeExporter.listenAddress }}"
+            - "--path.procfs={{ .Values.nodeExporter.procfsPath }}"
+            - "--path.sysfs={{ .Values.nodeExporter.sysfsPath }}"
+            - "--path.rootfs={{ .Values.nodeExporter.rootfsPath }}"
+            - "--collector.filesystem.ignored-mount-points='{{ .Values.nodeExporter.ignoredMountPoints }}'"
+          ports:
+            - containerPort: 9100
+          volumeMounts:
+            - name: procfs
+              mountPath: "/host/proc"
+              readOnly: true
+            - name: sysfs
+              mountPath: "/host/sys"
+              readOnly: true
+            - name: rootfs
+              mountPath: "/rootfs"
+              readOnly: true
+        - name: cadvisor-exporter
+          image: "{{ .Values.cadvisorExporter.image }}"
+          ports:
+            - containerPort: {{ .Values.cadvisorExporter.port }}
+          volumeMounts:
+            - name: rootfs
+              mountPath: "/rootfs"
+              readOnly: true
+            - name: var-run
+              mountPath: "/var/run"
+              readOnly: false
+            - name: sys
+              mountPath: "/sys"
+              readOnly: true
+            - name: var-lib-docker
+              mountPath: "/var/lib/docker"
+              readOnly: true
+      volumes:
+        - name: procfs
+          hostPath:
+            path: "/proc"
+        - name: sysfs
+          hostPath:
+            path: "/sys"
+        - name: rootfs
+          hostPath:
+            path: "/"
+        - name: var-run
+          hostPath:
+            path: "/var/run"
+        - name: sys
+          hostPath:
+            path: "/sys"
+        - name: var-lib-docker
+          hostPath:
+            path: "/var/lib/docker"
