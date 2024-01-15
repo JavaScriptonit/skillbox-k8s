@@ -1,6 +1,8 @@
 https://go.skillbox.ru/education/course/devops-kubernetes/8a160947-b911-4c2e-9953-bc3f8baf009f/videolesson
 
-# 8.1 LimitRange и ResourceQuota:
+# 8.2 LimitRange and Priority-классы:
+
+## LimitRange:
 1. `kubectl apply -f ./8.2/limit-range.yaml`:
     limitrange/resource-limits created
 2. `kubectl apply -f nginx-pod.yaml`
@@ -41,4 +43,3 @@ https://go.skillbox.ru/education/course/devops-kubernetes/8a160947-b911-4c2e-995
         image: nginx
     priorityClassName: high-priority
     ```
-    
