@@ -29,7 +29,41 @@ https://go.skillbox.ru/education/course/devops-kubernetes/9890e5bc-5c4a-4141-b40
         spec:
             group: metrics.k8s.io
             service:
-                name: metrics-server
+                name: metrics-server # APIService с именем v1beta1.metrics.k8s.io указывает на сервис metrics-server в пространстве имен kube-system
                 namespace: kube-system
             version: v1beta1
         ```
+2. `minikube addons enable metrics-server` - включить аддон metrics-server в миникубе
+или
+`wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml` - скачать готовые манифесты
+    1. `vi components.yaml` - ServiceAccount, ClusterRole (rbac), ClusterRoleBinding, Service, Deployment, APIService
+
+3. `kubectl top nodes`, `kubectl top pods` - realtime metrics
+
+4. `kubectl proxy --port=8080 &` - проксировать API к себе на локальную машину
+    1. `curl -s http://localhost:8080/apis | grep metrics` - метрики будут доступны только после включения metrics-server
+
+5. `kubectl apply -f ./components.yaml` - создать metrics-server
+
+6. `kubectl proxy --port=8080 &`, `curl -s http://localhost:8080/apis/metrics.k8s.io/v1beta1/nodes/minikube-m02` - CPU & memory
+
+7. `kubectl proxy --port=8080 &`, `curl -s http://localhost:8080/apis/metrics.k8s.io/v1beta1/pods/`- CPU & memory
+
+
+## Pod Distruption Budget:
+Подобъект PodDisruptionBudget (PDB) используется для управления доступностью подов в Kubernetes во время процедур обслуживания, таких как обновление версий, перезагрузка или удаление. PDB позволяет ограничить количество подов, которые могут быть одновременно недоступны в результате этих процедур.
+
+1. Пример манифеста:
+PDB устанавливает min кол-во доступных подов для подуровня с меткой app: server в 2. 
+k8s будет поддерживать не менее двух доступных подов с меткой app: server, чтобы обеспечить непрерывность работы приложения:
+```
+apiVersion: policy/v1
+kind: PodDistruptionBudget
+metadata:
+    name: server-pdb
+spec:
+    minAvailable: 2
+    selector:
+        matchLabels:
+            app: server
+```
