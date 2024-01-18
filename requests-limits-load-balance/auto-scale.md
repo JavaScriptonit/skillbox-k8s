@@ -53,7 +53,7 @@ https://go.skillbox.ru/education/course/devops-kubernetes/9890e5bc-5c4a-4141-b40
 ## Pod Distruption Budget:
 Подобъект PodDisruptionBudget (PDB) используется для управления доступностью подов в Kubernetes во время процедур обслуживания, таких как обновление версий, перезагрузка или удаление. PDB позволяет ограничить количество подов, которые могут быть одновременно недоступны в результате этих процедур.
 
-1. Пример манифеста:
+#### Пример манифеста:
 PDB устанавливает min кол-во доступных подов для подуровня с меткой app: server в 2. 
 k8s будет поддерживать не менее двух доступных подов с меткой app: server, чтобы обеспечить непрерывность работы приложения:
 ```
@@ -67,3 +67,17 @@ spec:
         matchLabels:
             app: server
 ```
+
+1. `kubectl apply deployment nginx --image=nginx --replicas 4` - создать deployment
+
+2. `kubectl get po -o -wide -w` - отображение подов
+
+3. `kubectl drain minikube-m02 --ignore-daemonsets` - завершить работу всех подов nginx на minikube-m02 и одновременно создать реплики на 1ой ноде minikube
+
+4. `kubectl apply pdb pdbdemo --min-available 2 -- selector "app=nginx"`
+
+5. `kubectl delete deployment.apps nginx`
+
+6. `kubectl uncordon minikube-m02` - сделать снова рабочей ноду minikube-m02
+
+7. `kubectl apply deployment nginx --image=nginx --replicas 4` - пересоздать deployment, `kubectl drain minikube-m02 --ignore-daemonsets` - с pdb не будут сразу удалены все реплики, пока не будут созданы 2 новые реплики на другой ноде
