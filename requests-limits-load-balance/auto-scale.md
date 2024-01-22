@@ -81,3 +81,28 @@ spec:
 6. `kubectl uncordon minikube-m02` - сделать снова рабочей ноду minikube-m02
 
 7. `kubectl apply deployment nginx --image=nginx --replicas 4` - пересоздать deployment, `kubectl drain minikube-m02 --ignore-daemonsets` - с pdb не будут сразу удалены все реплики, пока не будут созданы 2 новые реплики на другой ноде
+
+
+https://go.skillbox.ru/education/course/devops-kubernetes/78f1793d-c9ff-4322-a391-bf330e5ea143/videolesson
+
+# 8.4 Типы автомасштабирования в Kubernetes
+
+## Типы масштабирования:
+1. Horizontal Pod Autoscaler (HPA):
+    1. Кол-во реплик подов
+    2. Доступные типы метрик:
+        1. metrics-server (Стандартные metrics.k8s.io)
+        2. Метрики от адаптера в кластере custom.metrics.k8s.io:
+            1. Prometheus Adapter
+            2. Microsoft Azure Adapter
+            3. Google Stackdriver
+        3. Метрики от внешней системы external.metrics.k8s.io:
+            1. AWS CloudWatch
+    3. HPA v1 VS HPA v2
+        1. v1 - CPU & memory
+        2. v2 для типов объектов: ReplicationController, ReplicaSet, Deployment
+        3. Масштабирование происходит по стандартному типу метрики: CPU, 50m
+            1. Каждые 15 сек k8s HPA Controller собирает данные по использования метрик 
+            2. ### Алгоритм: числоРеплик = round[текущееЧислоРеплик*( текущееЗначениеМетрики/желаемоеЗначениеМетрики )]
+2. Vertical Pod Autoscaler
+3. Cluster Autoscaler
