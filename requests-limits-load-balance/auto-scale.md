@@ -89,6 +89,9 @@ https://go.skillbox.ru/education/course/devops-kubernetes/78f1793d-c9ff-4322-a39
 
 ## Типы масштабирования:
 1. Horizontal Pod Autoscaler (HPA):
+### `minikube addons enable metrics-server` - включить metrics-server для работы HPA в minikube
+`minikube addons list` - список всех вкл/выкл аддонов
+
     1. Кол-во реплик подов
     2. Доступные типы метрик:
         1. metrics-server (Стандартные metrics.k8s.io)
