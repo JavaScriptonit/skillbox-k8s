@@ -34,11 +34,11 @@ https://go.skillbox.ru/education/course/devops-kubernetes/9890e5bc-5c4a-4141-b40
             version: v1beta1
         ```
 2. `minikube addons enable metrics-server` - включить аддон metrics-server в миникубе
-или
-`wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml` - скачать готовые манифесты
+    или `wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml` - скачать готовые манифесты
     1. `vi components.yaml` - ServiceAccount, ClusterRole (rbac), ClusterRoleBinding, Service, Deployment, APIService
 
 3. `kubectl top nodes`, `kubectl top pods` - realtime metrics
+    1. ### `watch kubectl top pods` - realtime metrics monitoring
 
 4. `kubectl proxy --port=8080 &` - проксировать API к себе на локальную машину
     1. `curl -s http://localhost:8080/apis | grep metrics` - метрики будут доступны только после включения metrics-server
@@ -88,9 +88,9 @@ https://go.skillbox.ru/education/course/devops-kubernetes/78f1793d-c9ff-4322-a39
 # 8.4 Типы автомасштабирования в Kubernetes
 
 ## Типы масштабирования:
-1. Horizontal Pod Autoscaler (HPA):
-### `minikube addons enable metrics-server` - включить metrics-server для работы HPA в minikube
-`minikube addons list` - список всех вкл/выкл аддонов
+1. ### Horizontal Pod Autoscaler (HPA) - масштабирование засчет увеличения кол-ва подов:
+    ### `minikube addons enable metrics-server` - включить metrics-server для работы HPA в minikube
+    `minikube addons list` - список всех вкл/выкл аддонов
 
     1. Кол-во реплик подов
     2. Доступные типы метрик:
@@ -107,5 +107,28 @@ https://go.skillbox.ru/education/course/devops-kubernetes/78f1793d-c9ff-4322-a39
         3. Масштабирование происходит по стандартному типу метрики: CPU, 50m
             1. Каждые 15 сек k8s HPA Controller собирает данные по использования метрик 
             2. ### Алгоритм: числоРеплик = round[текущееЧислоРеплик*( текущееЗначениеМетрики/желаемоеЗначениеМетрики )]
-2. Vertical Pod Autoscaler
-3. Cluster Autoscaler
+    4. Test HPA minikube для масштабирования подов в реальном времени:
+        1. `watch kubectl top pods`
+        2. `kubectl get hpa -w`
+        3. `kubectl run tmp-pod --rm -i --tty --image nicolaka/netshoot -- /bin/bash`, `ab -t 300 -c 10 http://server:8080/pi?length=100` - создать нагрузку на веб сервер
+
+2. ### Vertical Pod Autoscaler (VPA) - масштабирование засчет увеличения ресурсов подов:
+    Может перезапустить под в случае его изменения
+    `git clone https://github.com/kubernetes/autoscaler.git` - скачать vpa. 
+    `cd autoscaler/vertical-pod-autoscaler`, `./hack/vpa-up.sh` - получить 3 пода в ns kube-system
+    `kubectl get po -n kube-system` - vpa-updater, vpa-admission-controller, vpa-recommender
+
+    1. Масштабирует поды вертикально
+    2. Устанавливает ресурсные запросы и лимиты в контейнерах
+    3. Устанавливается в кластер отдельно
+    4. Test VPA minikube для изменения рекомендаций в реальном времени:
+        1. `watch kubectl top pods`
+        2. `kubectl get vpa server-vpa -o json -w | jq '.status.recommendation'`
+        3. `kubectl run tmp-pod --rm -i --tty --image nicolaka/netshoot -- /bin/bash`, `ab -t 300 -c 10 http://server:8080/pi?length=100` - создать нагрузку на веб сервер
+
+3. ### Cluster Autoscaler - добавление/удаление НОД в зависимости от нужды:
+    Хорошая практика - PDB (PodDisruptionBudget), так как без него Cluster Autoscaler может пересоздать реплику работающего пода приложения если не настроен PDB
+    1. Создаёт и удаляет ноды в кластере
+    2. Работает в облаках
+    3. Реализация зависит от конкретного провайдера
+    4. Для продакшна необходим PDB
