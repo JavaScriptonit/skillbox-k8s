@@ -31,3 +31,20 @@ https://go.skillbox.ru/education/course/devops-kubernetes/1e0b6708-8a5b-4d77-9e7
     Это особенно полезно в динамических окружениях, где цели могут появляться и исчезать автоматически, таких как контейнерные оркестраторы (например, Kubernetes, Docker Swarm) или облачные окружения.
     1. k8s
     2. file_sd
+
+
+## Установка:
+1. Helm community chart
+    1. https://artifacthub.io/packages/helm/prometheus-community/prometheus - Repository Info
+    2. `helm repo add prometheus-community https://prometheus-community.github.io/helm-charts` - добавить репо
+    3. `kubectl create ns monitoring` - создать отдельный NS под мониторинг
+    4. `helm upgrade --install prometheus prometheus-community/prometheus -n monitoring` - установить из него чарт
+    5. `kubectl get po -n monitoring -w` - проверить работу подов
+    6. `export POD_NAME=$(kubectl get pods -n monitoring -l "app=prometheus,component=server" -o jsonpath='{.items[0].metadata.name}')` - получить имя пода
+    7. `kubectl port-forward -n monitoring $POD_NAME 9090` - forwarding from 127.0.0.1:9090 -> 9090
+    8. `localhost:9090` - перейти в prometheus веб интерфейс локально
+        1. alerts
+        2. graph
+        3. status
+2. Prometheus operator:
+    1. Создаёт в кластере k8s отдельный тип объект: service-monitor 
