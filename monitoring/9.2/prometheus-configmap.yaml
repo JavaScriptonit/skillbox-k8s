@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prom-prometheus-server
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: kubernetes-service-endpoints
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - action: keep
+            regax: true
+            source_labels: 
+              - __meta_kubernetes_service_annotation_prometheus_io_scrape
+          - action: replace
+            regex: (.+)
+            source_labels: 
+              - __meta_kubernetes_service_annotation_prometheus_io_path
+            target_label: __metrics_path__
+      - job_name: prometheus
+        static_configs: 
+        - targets:
+          - localhost:9090
+
+# kubernetes_sd_configs - вместо директивы static_configs
+# - role: endpoints - k8s запрашивает у k8s api список endpoints
+# настройка endpoint как цель по аннтоации - "__meta_kubernetes_service_annotation_prometheus_io_scrape"
