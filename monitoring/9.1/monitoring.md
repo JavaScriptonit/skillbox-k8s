@@ -48,3 +48,8 @@ https://go.skillbox.ru/education/course/devops-kubernetes/1e0b6708-8a5b-4d77-9e7
         3. status
 2. Prometheus operator:
     1. Создаёт в кластере k8s отдельный тип объект: service-monitor 
+
+## Просмотр всех текущих целей Prometheus:
+
+1. `localhost:9090/targets` - список всех целей
+2. `kubectl describe service -n kube-system kube-dns` - посмотреть аннтоации сервиса для Prometheus

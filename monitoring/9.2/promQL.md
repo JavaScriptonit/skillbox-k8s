@@ -10,6 +10,18 @@ https://go.skillbox.ru/education/course/devops-kubernetes/ae44ee2c-e331-4be0-acf
 4. `localhost:9090/metrics` - открыть все доступные метрики Prometheus
 
 
-## Конфигурация Prometheus:
+## PromQL:
+Как достать метрики из самого Prometheus:
 
-1. 
+`http://localhost:9090/graph` - просмотр и анализ различных метрик и данных, собранных и хранящихся в Prometheus
+
+### Примеры функций:
+
+1. `irate / rate `
+2. `sum`
+3. `count`
+4. `Арифметические операции`
+
+Example: 
+1. `promhttp_metrics_handler_requests_total{job="prometheus", code="200"}` - получить количество запросов с кодом ответа "200" для задания (job) "prometheus"
+2. rate(`promhttp_metrics_handler_requests_total{job="prometheus", code="200"}`[10m]) - теперь можно увидеть метрику за интервал 10 минут на графике
