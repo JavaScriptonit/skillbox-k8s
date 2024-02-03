@@ -53,3 +53,12 @@ https://go.skillbox.ru/education/course/devops-kubernetes/1e0b6708-8a5b-4d77-9e7
 
 1. `localhost:9090/targets` - список всех целей
 2. `kubectl describe service -n kube-system kube-dns` - посмотреть аннтоации сервиса для Prometheus
+
+
+https://go.skillbox.ru/education/course/devops-kubernetes/00588d9d-421c-404c-86cb-d41dfb39bb73/videolesson
+
+# 9.3 Prometheus exporters, Alert Manager и Grafana
+
+1. `kubectl get deamonsets.apps -n monitoring` - проверка каждый ноды на наличие экспортёра осуществляется при помощи объекта `prometheus-node-exporter`
+2. `kubectl get po -n monitoring` - `prometheus-node-exporter-pwlt` 
+    1. `kubectl describe po -n monitoring prometheus-node-exporter-pwlt` - достаёт все метрики с хоста
