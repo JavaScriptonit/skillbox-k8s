@@ -55,10 +55,23 @@ https://go.skillbox.ru/education/course/devops-kubernetes/1e0b6708-8a5b-4d77-9e7
 2. `kubectl describe service -n kube-system kube-dns` - посмотреть аннтоации сервиса для Prometheus
 
 
+
 https://go.skillbox.ru/education/course/devops-kubernetes/00588d9d-421c-404c-86cb-d41dfb39bb73/videolesson
 
 # 9.3 Prometheus exporters, Alert Manager и Grafana
 
 1. `kubectl get deamonsets.apps -n monitoring` - проверка каждый ноды на наличие экспортёра осуществляется при помощи объекта `prometheus-node-exporter`
-2. `kubectl get po -n monitoring` - `prometheus-node-exporter-pwlt` 
+2. `kubectl get po -n monitoring` - `prometheus-node-exporter-pwlt`
     1. `kubectl describe po -n monitoring prometheus-node-exporter-pwlt` - достаёт все метрики с хоста
+    2. `kubectl describe service -n monitoring prometheus-node-exporter` - чтобы прометеус начал собирать метрики с сервиса - должна быть аннотация
+        1. `Annotations: prometheus.io/scrape: true`
+
+## AlertManager.
+Каналы доставки:
+
+1. Email
+2. Slack
+3. PagerDuty
+4. WebHooks
+5. Другие
+
