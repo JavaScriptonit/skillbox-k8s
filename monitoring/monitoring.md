@@ -75,3 +75,23 @@ https://go.skillbox.ru/education/course/devops-kubernetes/00588d9d-421c-404c-86c
 4. WebHooks
 5. Другие
 
+### Поменять ConfigMap Prometheus для создания правила нотификации:
+
+1. `kubectl edit cm -n monitoring prometheus-server` - добавить строки из ./monitoring/9.3/alerting_rules.yaml в `data: alerting_rules.yml: | groups...`
+2. `kubectl apply -f alert_manager.yaml -n monitoring` - создать конфигурацию для Slack (kind: ConfigMap) для нотификации в Slack по выбранному alert
+    1. Пример конфигурации: `./monitoring/9.3/alert-manager.yaml` для отправки resolved notifications
+
+## Grafana
+https://artifacthub.io/packages/helm/grafana/grafana
+
+1. `helm repo add grafana https://grafana.github.io/helm-charts` - добавить реп-ий
+2. `helm repo update` - обновить все реп-ии
+3. `helm install grafana grafana/grafana -n monitoring` - установить графану в ns monitoring
+    1. Установщик подскажет как получить пароль от УЗ admin
+    2. Установщик подскажет как прокинуть порт на localhost
+4. Добавить prometheus как источник данных:
+    1. localhost:3000 -> admin:password
+    2. `kubectl get service -n monitoring` -> prometheus-server
+    3. Configuration -> Data sorces -> add data source -> prometheus -> HTTP [URL: http://prometheus-server] -> save
+5. Create dashboard -> Add a new panel -> promQL запрос (prometheus_http_requests_total)
+
