@@ -55,6 +55,30 @@ https://go.skillbox.ru/education/course/devops-kubernetes/1e0b6708-8a5b-4d77-9e7
 2. `kubectl describe service -n kube-system kube-dns` - посмотреть аннтоации сервиса для Prometheus
 
 
+## Prometheus-библиотеки:
+
+1. Официально поддерживаемые:
+    1. Go
+    2. Java/Scala
+    3. Python
+    4. Rube
+2. Неофициальные:
+    1. Bash
+    2. C/C++
+    3. Common Lisp
+    4. Dart
+    5. Elixir
+    6. Erlang
+    7. Haskell
+    8. Lua for Nginx / Lua for Tarantool
+    9. .NET / C#
+    10. Node.js
+    11. OCaml
+    12. Perl
+    13. PHP
+    14. R
+    15. Rust
+
 
 https://go.skillbox.ru/education/course/devops-kubernetes/00588d9d-421c-404c-86cb-d41dfb39bb73/videolesson
 
@@ -95,3 +119,21 @@ https://artifacthub.io/packages/helm/grafana/grafana
     3. Configuration -> Data sorces -> add data source -> prometheus -> HTTP [URL: http://prometheus-server] -> save
 5. Create dashboard -> Add a new panel -> promQL запрос (prometheus_http_requests_total)
 
+
+
+# 9.5 Loki
+https://go.skillbox.ru/education/course/devops-kubernetes/3face08a-13ea-4e3c-a74b-27d7cf37ea0f/videolesson
+
+1. Логи пода k8s - `kubectl logs` - покажет логи текущего контейнера приложения 
+2. `helm repo add grafana https://grafana.github.io/helm-charts` - скачать
+3. `helm repo update` - обновить репы
+4. `helm upgrade --install loki grafana/loki-stack -n monitoring` - поставить чарт
+5. `kubectl get po -n monitoring` - `loki-promtail-pwlt`, `loki-0`
+6. `kubectl get all -n monitoring | grep loki` - pods, services, ds, ss
+7. `kubectl get cm -n monitoring | grep loki` - x3 cm
+4. Добавить loki как источник данных:
+    1. localhost:3000 -> admin:password
+    2. `kubectl describe service -n monitoring loki` -> loki:3100
+    3. Configuration -> Data sorces -> add data source -> loki -> HTTP [URL: http://loki:3100] -> save
+5. Explore -> Loki -> Log browser -> app -> billing -> show logs 
+6. Create dashboard -> Add a new panel -> logs (panel) -> Loki (data source) -> Log browser -> `{app="billing"} != "/metrics"`
